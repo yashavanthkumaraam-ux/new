@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JeevaDrop</title>
+<link rel="icon" href="jeevadrop.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#b3122f">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f6f7;--surface:#fff;--ink:#14202b;--mute:#5b6b78;--line:#d6dee3;--red:#b3122f;--red-ink:#fff;--teal:#0e7c7b;--ok:#0e7c4a;--warn:#a85a00;
+--glow:radial-gradient(900px 520px at 100% -5%,rgba(179,18,47,.16),transparent 60%),radial-gradient(800px 480px at -5% 105%,rgba(14,124,123,.16),transparent 60%);
+--drops:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cpath d='M70 22c-9 14-17 24-17 34a17 17 0 0 0 34 0c0-10-8-20-17-34z' fill='%23b3122f' fill-opacity='.07'/%3E%3C/svg%3E");
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f171d;--surface:#18232b;--ink:#e8eef2;--mute:#97a8b5;--line:#2b3a45;--red:#e5384f;--red-ink:#fff;--teal:#3cc0bd;--ok:#4cc58a;--warn:#e3a14a}}
+:root[data-theme="dark"]{--bg:#0f171d;--surface:#18232b;--ink:#e8eef2;--mute:#97a8b5;--line:#2b3a45;--red:#e5384f;--red-ink:#fff;--teal:#3cc0bd;--ok:#4cc58a;--warn:#e3a14a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background-color:var(--bg);background-image:var(--drops),var(--glow);background-attachment:fixed;background-repeat:repeat,no-repeat;color:var(--ink);font:16px/1.5 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+header h1{font-size:clamp(1.9rem,5vw,2.8rem);line-height:1.05;margin:8px 0 6px;font-weight:800;letter-spacing:-.02em}
+header{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.brand-logo{height:120px;width:auto;background:#fff;border-radius:14px;padding:8px;box-shadow:0 2px 12px rgba(0,0,0,.10);display:block}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+header p{margin:0;color:var(--mute);max-width:46ch;flex:1 1 260px}
+nav{display:flex;gap:6px;margin:22px 0 18px;overflow-x:auto;border-bottom:1px solid var(--line)}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font:600 1rem inherit;font-family:inherit;color:var(--mute);cursor:pointer;white-space:nowrap}
+nav button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--red)}
+:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+h2{font-size:1.25rem;margin:0 0 12px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:18px}
+.groups{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.g{border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:14px 6px;cursor:pointer;font-family:inherit;text-align:center}
+.g b{display:block;font-size:2rem;line-height:1;font-weight:800}
+.g small{color:var(--mute)}
+.g[aria-pressed=true]{background:var(--red);border-color:var(--red);color:var(--red-ink)}
+.g[aria-pressed=true] small{color:var(--red-ink);opacity:.9}
+.g.low b{color:var(--warn)}.g[aria-pressed=true].low b{color:var(--red-ink)}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+label{display:block;font-size:.88rem;color:var(--mute);margin-bottom:4px}
+input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+.btn{background:var(--red);color:var(--red-ink);border:0;border-radius:6px;padding:11px 18px;font:600 1rem inherit;font-family:inherit;cursor:pointer}
+.btn.alt{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:6px 10px;font-size:.88rem}
+.item{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.item:first-of-type{border-top:0}
+.tag{display:inline-block;min-width:44px;text-align:center;font-weight:800;color:var(--red);border:2px solid var(--red);border-radius:6px;padding:2px 6px;margin-right:10px}
+.meta{color:var(--mute);font-size:.9rem}
+.ok{color:var(--ok);font-weight:600}.wait{color:var(--warn);font-weight:600}.crit{color:var(--red);font-weight:800}
+a{color:var(--teal);font-weight:600}
+.empty{color:var(--mute);padding:8px 0}
+.stock{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}
+.stock span{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:6px;padding:2px 4px;font-size:.88rem}
+.stock button{border:0;background:var(--bg);color:var(--ink);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:1rem}
+#msg{min-height:1.4em;color:var(--ok);font-weight:600;margin-bottom:8px}
+[hidden]{display:none!important}
+@media (max-width:560px){.groups{grid-template-columns:repeat(4,1fr);gap:6px}.g b{font-size:1.4rem}}
+
+.auth{display:grid;grid-template-columns:1fr 1fr;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--surface);box-shadow:0 6px 28px rgba(0,0,0,.08);margin-bottom:18px}
+.auth-form{padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
+.auth-form h2{font-size:2rem;font-weight:800;letter-spacing:.02em;color:var(--teal);margin:0}
+.auth-form .sub{color:var(--mute);margin:2px 0 22px}
+.auth-form label{margin-top:12px}
+.pw{position:relative}
+.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--teal);font:600 .85rem inherit;font-family:inherit;cursor:pointer;padding:6px}
+.pw input{padding-right:60px}
+.auth-opts{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 18px;font-size:.9rem;flex-wrap:wrap}
+.auth-opts label{display:flex;align-items:center;gap:6px;margin:0;color:var(--mute)}
+.auth input[type=checkbox]{width:auto}
+.btn.teal{background:var(--teal);color:#fff;width:100%;padding:12px}
+.auth-alt{text-align:center;margin:16px 0 0;font-size:.9rem}
+.auth-art{background:#f8f4e9;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center}
+.auth-art img{width:min(100%,210px);height:auto;display:block}
+.auth-note{margin:18px 0 0;color:#0b5f5e;font-weight:700;font-size:1.05rem}
+.auth-note small{display:block;color:#4a5a66;font-weight:400;font-size:.9rem;margin-top:2px}
+@media (max-width:720px){.auth{grid-template-columns:1fr}.auth-form{padding:30px 22px}}
+
+.menu-btn{width:46px;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;flex:none;position:relative}
+.menu-btn span{display:block;width:22px;height:2.5px;border-radius:2px;background:var(--ink)}
+.dot{position:absolute;top:6px;right:6px;width:11px;height:11px;border-radius:50%;background:var(--red);border:2px solid var(--surface)}
+.scrim{position:fixed;inset:0;background:rgba(10,20,28,.5);z-index:40}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(300px,84vw);background:var(--surface);z-index:50;padding:calc(16px + env(safe-area-inset-top,0px)) 14px 16px;box-shadow:6px 0 30px rgba(0,0,0,.2);transform:translateX(-100%);visibility:hidden;transition:transform .25s ease,visibility .25s;display:flex;flex-direction:column;gap:4px}
+.drawer.open{transform:none;visibility:visible}
+.dhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dhead img{height:64px;width:auto;background:#fff;border-radius:10px;padding:4px}
+.dclose{background:none;border:0;font-size:2rem;line-height:1;color:var(--ink);cursor:pointer;padding:4px 10px}
+.ditem{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:14px 12px;font:600 1.05rem inherit;font-family:inherit;color:var(--ink);cursor:pointer}
+.ditem:hover{background:var(--bg)}
+.nbadge{background:var(--red);color:var(--red-ink);border-radius:999px;font-size:.8rem;min-width:22px;padding:1px 7px;text-align:center}
+.note{display:block;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:8px;padding:10px 12px;margin-bottom:8px;font:inherit;color:var(--ink);cursor:pointer}
+.note.crit{border-left-color:var(--red)}
+.note b{display:block}.note span{color:var(--mute);font-size:.92rem}
+.about p,.about li{max-width:68ch}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}}
+.about .tagline{color:var(--red);font-weight:800;font-size:1.15rem;margin:-4px 0 12px}
+.about h3{font-size:1.1rem;margin:0 0 6px;color:var(--teal)}
+.about ul{padding-left:20px;margin:0}.about li{margin-bottom:8px}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.about-grid .panel{margin-bottom:0}
+.vals{gap:12px;margin-bottom:0}
+.vals>div{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--bg)}
+.vals b{display:block;color:var(--teal);margin-bottom:2px}
+@media (max-width:640px){.about-grid{grid-template-columns:1fr}}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,220px));gap:12px}
+.gallery figure{margin:0}
+.gallery img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;display:block;background:var(--bg)}
+.gallery figcaption{margin-top:6px;font-size:.9rem;color:var(--mute)}</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <button class="menu-btn" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i class="dot" id="mdot" hidden></i></button>
+  <img src="jeevadrop.png" alt="JeevaDrop: Every Drop Creates Hope" class="brand-logo">
+  <h1 class="sr">JeevaDrop</h1>
+  <div style="font-family: sans-serif;text-align: left;">
+  <h1 style="font-size: 3rem;margin: 0 0 10px 0;color: #000;">JeevaDrop</h1>
+  <p style="color: rgb(115, 77, 146);font-size: 16px;margin-top: 5px;">"A single drop can restart a heartbeat.Experiance the power of giving with JeevaDrop</p></div>
+  </h1>
+</header>
+  <p>Search donors and blood banks by blood group and city, post an emergency request, or register to donate.</p>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Menu">
+  <div class="dhead"><img src="jeevadrop.png" alt="JeevaDrop"><button class="dclose" id="dclose" aria-label="Close menu">&times;</button></div>
+  <button class="ditem" data-go="about">About</button>
+  <button class="ditem" data-go="notif">Notifications <span class="nbadge" id="nbadge" hidden></span></button>
+  <button class="ditem" data-go="login" id="dlogin">Hospital login</button>
+</aside>
+<nav role="tablist" id="tabs">
+  <button role="tab" data-t="find" aria-selected="true">Find blood</button>
+  <button role="tab" data-t="donate" aria-selected="false">Become a donor</button>
+  <button role="tab" data-t="req" aria-selected="false">Emergency requests</button>
+  <button role="tab" data-t="stock" aria-selected="false">Blood bank stock</button>
+</nav>
+<div id="msg" role="status" aria-live="polite"></div>
+
+<section id="find">
+  <div class="panel">
+    <h2>Which blood group is needed?</h2>
+    <div class="groups" id="groups"></div>
+    <div class="row" style="margin-top:14px">
+      <div><label for="fcity">City (leave empty for all)</label><input id="fcity" placeholder="e.g. Bengaluru"></div>
+    </div>
+    <p class="meta" id="compat"></p>
+  </div>
+  <div class="panel"><h2>Blood banks</h2><div id="banks"></div></div>
+  <div class="panel"><h2>Donors</h2><div id="donors"></div></div>
+</section>
+
+<section id="donate" hidden>
+  <div class="panel">
+    <h2>Register as a donor</h2>
+    <form id="dform" class="row" onsubmit="return false">
+      <div><label for="dn">Full name</label><input id="dn" required></div>
+      <div><label for="dg">Blood group</label><select id="dg"></select></div>
+      <div><label for="dc">City</label><input id="dc" required></div>
+      <div><label for="dp">Phone</label><input id="dp" type="tel" inputmode="tel" required></div>
+      <div><label for="dd">Last donated (optional)</label><input id="dd" type="date"></div>
+      <div style="align-self:end"><button class="btn" id="dsave" type="button">Register donor</button></div>
+    </form>
+    <p class="meta">Donors are shown as available again 90 days after their last donation.</p>
+  </div>
+  <div class="panel"><h2>Registered donors</h2><div id="dlist"></div></div>
+</section>
+
+<section id="req" hidden>
+  <div class="panel">
+    <h2>Post an emergency request</h2>
+    <form id="rform" class="row" onsubmit="return false">
+      <div><label for="rp">Patient name</label><input id="rp"></div>
+      <div><label for="rg">Blood group needed</label><select id="rg"></select></div>
+      <div><label for="ru">Units</label><input id="ru" type="number" min="1" value="1"></div>
+      <div><label for="rh">Hospital</label><input id="rh"></div>
+      <div><label for="rc">City</label><input id="rc"></div>
+      <div><label for="rt">Contact phone</label><input id="rt" type="tel" inputmode="tel"></div>
+      <div><label for="rl">Urgency</label><select id="rl"><option>Critical (within hours)</option><option>Urgent (within a day)</option><option>Planned</option></select></div>
+      <div style="align-self:end"><button class="btn" id="rsave" type="button">Post request</button></div>
+    </form>
+  </div>
+  <div class="panel"><h2>Open requests</h2><div id="rlist"></div></div>
+</section>
+
+<section id="stock" hidden>
+  <div class="panel"><h2>Blood bank stock</h2><p class="meta" id="stocknote"></p><div id="slist"></div></div>
+  <div class="panel" id="resetbox" hidden><button class="btn alt" id="reset">Reset demo data</button></div>
+</section>
+
+<section id="about" class="about" hidden>
+  <div class="panel">
+    <h2>About JeevaDrop ❤️</h2>
+    <p class="tagline">Every Drop Creates Hope</p>
+    <p>JeevaDrop is a blood donation and emergency blood availability platform created with one meaningful mission: to connect blood donors, hospitals, and people in need of blood.</p>
+    <p>In medical emergencies, finding the right blood group at the right time can be challenging. JeevaDrop aims to make this process easier by helping people discover potential blood donors, check available blood bank stock, and communicate their blood requirements through one convenient platform.</p>
+  </div>
+
+  <div class="about-grid">
+    <div class="panel"><h3>Our Mission</h3><p>To make blood donor discovery easier, improve access to blood availability information, and encourage more people to become voluntary blood donors.</p></div>
+    <div class="panel"><h3>Our Vision</h3><p>A world where no one struggles to find a potential blood donor because of a lack of information or connections.</p></div>
+  </div>
+
+  <div class="panel">
+    <h2>What We Offer</h2>
+    <ul>
+      <li><b>Find Blood Donors:</b> Search for potential donors by blood group and location.</li>
+      <li><b>Blood Bank Information:</b> Explore registered blood banks and their available stock information.</li>
+      <li><b>Emergency Blood Requests:</b> Share urgent blood requirements to help connect patients with potential donors.</li>
+      <li><b>Donor Registration:</b> Register as a donor and become part of a lifesaving community. Donors show as available again 90 days after their last donation.</li>
+      <li><b>Hospital Access:</b> A dedicated login for authorized hospitals to update the stock and details of their own blood bank.</li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h2>Our Core Values</h2>
+    <div class="about-grid vals">
+      <div><b>Compassion</b>Every person deserves care and support.</div>
+      <div><b>Community</b>Together, donors, hospitals, and families can help more people.</div>
+      <div><b>Accessibility</b>Make blood-related information easier to find and understand.</div>
+      <div><b>Trust</b>Protect personal information and promote responsible use of donor information.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Join the JeevaDrop Community</h2>
+    <p>Your willingness to donate blood could make a meaningful difference in someone’s life. Register as a donor, help spread awareness, and encourage others to participate in voluntary blood donation.</p>
+    <p><b>JeevaDrop: Every Drop Creates Hope. Every Donor Makes a Difference.</b></p>
+    <button class="btn" type="button" onclick="tab('donate')">Become a donor</button>
+  </div>
+<div class="panel">
+  <h2>Our Community</h2>
+  <div class="gallery">
+    <figure class="donor-figure">
+    <img
+        src="donor.png" alt="Person donating blood at a blood donation camp"
+        loading="lazy"
+    >
+    <figcaption>
+        Every donation helps save a life.
+    </figcaption>
+</figure>
+    <!-- add the next images here, copy the whole <figure> block -->
+  </div>
+</div>
+  <div class="panel">
+    <p class="meta"><b>In a medical emergency, call your local emergency number first (112 in India).</b> JeevaDrop is a platform intended to facilitate donor discovery and blood availability information. Actual blood availability, donor eligibility, compatibility, and transfusion decisions must be confirmed by qualified healthcare professionals and authorized blood banks.</p>
+  </div>
+</section>
+
+<section id="notif" hidden>
+  <div class="panel"><h2>Notifications</h2><div id="nlist"></div></div>
+</section>
+
+<section id="login" hidden>
+  <div class="panel" id="whobox" style="max-width:420px" hidden>
+    <h2 id="who"></h2>
+    <p class="meta">You can edit stock and details for your own blood bank only.</p>
+    <button class="btn alt" id="lout">Log out</button>
+  </div>
+</section>
+</div>
+
+<script>
+const G=['A+','A-','B+','B-','AB+','AB-','O+','O-'];
+const CAN={'O-':['O-'],'O+':['O-','O+'],'A-':['A-','O-'],'A+':['A+','A-','O+','O-'],'B-':['B-','O-'],'B+':['B+','B-','O+','O-'],'AB-':['A-','B-','AB-','O-'],'AB+':G};
+let S={donors:[],banks:[],reqs:[]};
+let me=null;
+const api=async(p,m='GET',b)=>{const r=await fetch('/api/'+p,{method:m,headers:{'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error||'Request failed')}return r.json()};
+const load=async()=>{[S.donors,S.banks,S.reqs]=await Promise.all([api('donors'),api('banks'),api('requests')]);badge()};
+const loadMe=async()=>{me=(await api('me')).user};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const days=d=>d?Math.floor((Date.now()-new Date(d))/864e5):9999;
+const avail=d=>days(d.last)>=90;
+const total=g=>S.banks.reduce((n,b)=>n+(b.stock[g]||0),0);
+const match=(c,f)=>!f||c.toLowerCase().includes(f.toLowerCase().trim());
+let sel='O+';
+const say=t=>{$('msg').textContent=t;setTimeout(()=>{if($('msg').textContent===t)$('msg').textContent=''},3500)};
+
+function drawGroups(){
+ $('groups').innerHTML=G.map(g=>{const n=total(g);return `<button class="g ${n<4?'low':''}" data-g="${g}" aria-pressed="${g===sel}"><b>${g}</b><small>${n} units</small></button>`}).join('');
+ $('groups').querySelectorAll('button').forEach(b=>b.onclick=()=>{sel=b.dataset.g;drawFind()});
+}
+function drawFind(){
+ drawGroups();
+ const ok=CAN[sel],f=$('fcity').value;
+ $('compat').textContent=`A patient with ${sel} can receive blood from: ${ok.join(', ')}.`;
+ const banks=S.banks.filter(b=>match(b.city,f)).map(b=>({b,exact:b.stock[sel]||0,all:ok.reduce((n,g)=>n+(b.stock[g]||0),0)})).sort((x,y)=>y.exact-x.exact||y.all-x.all);
+ $('banks').innerHTML=banks.length?banks.map(({b,exact,all})=>`<div class="item"><div><b>${esc(b.name)}</b><div class="meta">${esc(b.city)} · <a href="tel:${esc(b.phone)}">${esc(b.phone)}</a></div></div><div><span class="${exact?'ok':'crit'}">${exact} units of ${sel}</span><div class="meta">${all} compatible units in total</div></div></div>`).join(''):'<div class="empty">No blood banks found in this city.</div>';
+ const ds=S.donors.filter(d=>ok.includes(d.group)&&match(d.city,f)).sort((a,b)=>avail(b)-avail(a)||(b.group===sel)-(a.group===sel));
+ $('donors').innerHTML=ds.length?ds.map(d=>`<div class="item"><div><span class="tag">${d.group}</span><b>${esc(d.name)}</b><div class="meta">${esc(d.city)}</div></div><div>${avail(d)?'<span class="ok">Available</span>':`<span class="wait">Available in ${90-days(d.last)} days</span>`} · <a href="tel:${esc(d.phone)}">Call ${esc(d.phone)}</a></div></div>`).join(''):`<div class="empty">No matching donors yet. <a href="#" id="toreq">Post an emergency request</a> or ask someone to register.</div>`;
+ const t=$('toreq');if(t)t.onclick=e=>{e.preventDefault();$('rg').value=sel;$('rc').value=f;tab('req')};
+}
+function drawDonors(){
+ $('dlist').innerHTML=S.donors.length?S.donors.map(d=>`<div class="item"><div><span class="tag">${d.group}</span><b>${esc(d.name)}</b><div class="meta">${esc(d.city)} · ${esc(d.phone)}</div></div><div>${avail(d)?'<span class="ok">Available</span>':'<span class="wait">Resting</span>'} <button class="btn alt sm" data-del="${d.id}">Remove</button></div></div>`).join(''):'<div class="empty">No donors registered yet.</div>';
+ $('dlist').querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{await api('donors/'+b.dataset.del,'DELETE');await load();drawDonors();say('Donor removed')});
+}
+function drawReqs(){
+ const r=[...S.reqs].sort((a,b)=>a.done-b.done||b.id-a.id);
+ $('rlist').innerHTML=r.length?r.map(q=>{const n=S.donors.filter(d=>CAN[q.group].includes(d.group)&&avail(d)&&match(d.city,q.city)).length;
+  return `<div class="item"><div><span class="tag">${q.group}</span><b>${esc(q.units)} unit(s)</b> for ${esc(q.patient||'a patient')}<div class="meta">${esc(q.hospital)}, ${esc(q.city)} · <a href="tel:${esc(q.phone)}">${esc(q.phone)}</a></div><div class="${q.done?'ok':q.level.startsWith('Critical')?'crit':'wait'}">${q.done?'Fulfilled':esc(q.level)}</div></div><div>${q.done?'':`<span class="meta">${n} available donor(s) nearby</span> `}${q.done?'':`<button class="btn sm" data-ok="${q.id}">Mark fulfilled</button> `}<button class="btn alt sm" data-rm="${q.id}">Delete</button></div></div>`}).join(''):'<div class="empty">No requests yet.</div>';
+ $('rlist').querySelectorAll('[data-ok]').forEach(b=>b.onclick=async()=>{await api('requests/'+b.dataset.ok+'/fulfil','POST');await load();drawReqs();say('Request marked as fulfilled')});
+ $('rlist').querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{await api('requests/'+b.dataset.rm,'DELETE');await load();drawReqs();say('Request deleted')});
+}
+function paintAuth(){
+ $('dlogin').textContent=me?'Hospital: '+me.name:'Hospital login';
+ $('whobox').hidden=!me;$('resetbox').hidden=!me;
+ if(me)$('who').textContent='Signed in as '+me.name;
+ $('stocknote').textContent=me?'You can change units and details for your own blood bank. Other banks are view-only.':'View only. Hospital staff can log in to update their blood bank stock.';
+}
+function drawStock(){
+ paintAuth();
+ $('slist').innerHTML=S.banks.map(b=>{const mine=me&&me.bank_id===b.id;
+  const chips=G.map(g=>mine?`<span><b>${g}</b><button aria-label="Remove one ${g} unit" data-b="${b.id}" data-g="${g}" data-d="-1">−</button>${b.stock[g]||0}<button aria-label="Add one ${g} unit" data-b="${b.id}" data-g="${g}" data-d="1">+</button></span>`:`<span><b>${g}</b> ${b.stock[g]||0}</span>`).join('');
+  const edit=mine?`<div class="row" style="margin:10px 0"><div><label for="bn">Name</label><input id="bn" value="${esc(b.name)}"></div><div><label for="bc">City</label><input id="bc" value="${esc(b.city)}"></div><div><label for="bp">Phone</label><input id="bp" value="${esc(b.phone)}"></div><div style="align-self:end"><button class="btn sm" id="bsave">Save details</button></div></div>`:'';
+  return `<div class="item" style="display:block"><b>${esc(b.name)}</b> <span class="meta">${esc(b.city)}${mine?' · your blood bank':''}</span>${edit}<div class="stock">${chips}</div></div>`}).join('');
+ $('slist').querySelectorAll('[data-b]').forEach(x=>x.onclick=async()=>{try{await api('banks/'+x.dataset.b+'/stock','POST',{group:x.dataset.g,delta:+x.dataset.d})}catch(e){say(e.message);return}await load();drawStock()});
+ const bs=$('bsave');if(bs)bs.onclick=async()=>{try{await api('banks/'+me.bank_id,'PUT',{name:$('bn').value,city:$('bc').value,phone:$('bp').value})}catch(e){say(e.message);return}await load();drawStock();say('Blood bank details saved.')};
+}
+function notifs(){
+ const out=[],crit=q=>q.level.startsWith('Critical');
+ [...S.reqs].filter(q=>!q.done).sort((a,b)=>crit(b)-crit(a)).forEach(q=>out.push({key:'r'+q.id,lvl:crit(q)?'crit':'wait',title:(crit(q)?'Critical request: ':'Blood request: ')+q.group,text:`${esc(q.units)} unit(s) needed at ${esc(q.hospital)}, ${esc(q.city)}.`,go:'req'}));
+ G.forEach(g=>{const n=total(g);if(n<4)out.push({key:'s'+g+n,lvl:n===0?'crit':'wait',title:(n===0?'Out of stock: ':'Low stock: ')+g,text:`${n} unit(s) left across all blood banks.`,go:'find',g})});
+ const mb=me&&S.banks.find(x=>x.id===me.bank_id);
+ if(mb)G.forEach(g=>{const n=mb.stock[g]||0;if(n<3)out.push({key:'m'+g+n,lvl:'wait',title:'Your bank is low on '+g,text:`${esc(mb.name)} has ${n} unit(s) of ${g}.`,go:'stock'})});
+ return out;
+}
+const sigOf=n=>n.map(x=>x.key).join('|');
+function badge(){
+ const n=notifs();let seen='';try{seen=localStorage.getItem('jd-seen')||''}catch(e){}
+ $('nbadge').textContent=n.length;$('nbadge').hidden=!n.length;
+ $('mdot').hidden=!(n.length&&sigOf(n)!==seen);
+}
+function drawNotif(){
+ const n=notifs();try{localStorage.setItem('jd-seen',sigOf(n))}catch(e){}
+ $('mdot').hidden=true;
+ $('nlist').innerHTML=n.length?n.map(x=>`<button class="note ${x.lvl}" data-go="${x.go}"${x.g?` data-g="${x.g}"`:''}><b>${esc(x.title)}</b><span>${x.text}</span></button>`).join(''):'<div class="empty">No notifications right now. All clear.</div>';
+ $('nlist').querySelectorAll('.note').forEach(b=>b.onclick=()=>{if(b.dataset.g)sel=b.dataset.g;tab(b.dataset.go)});
+}
+const VIEWS=['find','donate','req','stock','login','about','notif'];
+function tab(t){
+ document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));
+ VIEWS.forEach(s=>$(s).hidden=s!==t);
+ ({find:drawFind,donate:drawDonors,req:drawReqs,stock:drawStock,login:paintAuth,about:()=>{},notif:drawNotif})[t]();
+ window.scrollTo(0,0);
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.t));
+const drawer=$('drawer'),scrim=$('scrim');
+function openMenu(o){
+ drawer.classList.toggle('open',o);scrim.hidden=!o;
+ $('menu').setAttribute('aria-expanded',o);drawer.setAttribute('aria-hidden',!o);
+ if(o){badge();$('dclose').focus()}else $('menu').focus();
+}
+$('menu').onclick=()=>openMenu(true);
+$('dclose').onclick=scrim.onclick=()=>openMenu(false);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drawer.classList.contains('open'))openMenu(false)});
+document.querySelectorAll('#drawer [data-go]').forEach(b=>b.onclick=()=>{openMenu(false);const t=b.dataset.go;if(t==='login'&&!me){location.href='login.html';return}tab(t)});
+$('fcity').oninput=drawFind;
+['dg','rg'].forEach(id=>$(id).innerHTML=G.map(g=>`<option>${g}</option>`).join(''));
+$('dsave').onclick=async()=>{
+ const n=$('dn').value.trim(),c=$('dc').value.trim(),p=$('dp').value.trim();
+ if(!n||!c||!/^[0-9+\- ]{7,15}$/.test(p)){say('Enter a name, city and valid phone number.');return}
+ try{await api('donors','POST',{name:n,group:$('dg').value,city:c,phone:p,last:$('dd').value})}catch(e){say(e.message);return}await load();
+ ['dn','dc','dp','dd'].forEach(i=>$(i).value='');drawDonors();say('Thank you. You are now registered as a donor.');
+};
+$('rsave').onclick=async()=>{
+ const h=$('rh').value.trim(),c=$('rc').value.trim(),p=$('rt').value.trim();
+ if(!h||!c||!/^[0-9+\- ]{7,15}$/.test(p)){say('Enter the hospital, city and a valid contact phone.');return}
+ try{await api('requests','POST',{patient:$('rp').value.trim(),group:$('rg').value,units:+$('ru').value||1,hospital:h,city:c,phone:p,level:$('rl').value})}catch(e){say(e.message);return}await load();
+ ['rp','rh','rc','rt'].forEach(i=>$(i).value='');drawReqs();say('Request posted.');
+};
+$('reset').onclick=async()=>{try{await api('reset','POST')}catch(e){say(e.message);return}await load();drawStock();say('Demo data restored.')};
+$('lout').onclick=async()=>{await api('logout','POST');me=null;say('Logged out.');tab('find')};
+Promise.all([load(),loadMe()]).then(()=>{paintAuth();badge();location.hash==='#stock'?tab('stock'):drawFind()}).catch(()=>say('Could not reach the server.'));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Hospital Login · JeevaDrop</title>
+<link rel="icon" href="jeevadrop.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0a8a92;--teal-dark:#0b5a63;--ink:#14202b;--mute:#5b6b78;--line:#cdd8de;--red:#b3122f;--cyan:#e2f5f8}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font:16px/1.5 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:#fff}
+.page{min-height:100%;display:grid;grid-template-columns:1fr 1fr;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.left{display:flex;align-items:center;justify-content:center;padding:32px 24px;background:#fff}
+.box{width:100%;max-width:360px}
+.logo{height:84px;width:auto;display:block;margin:0 0 14px}
+h1{margin:0;font-size:2.4rem;line-height:1;font-weight:800;letter-spacing:.03em;color:var(--teal-dark)}
+.sub{margin:4px 0 26px;color:var(--mute)}
+label{display:block;font-size:.85rem;color:var(--mute);margin:14px 0 4px}
+input[type=text],input[type=password]{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;font:inherit;color:var(--ink);background:#fff}
+input:focus{outline:3px solid rgba(10,138,146,.35);border-color:var(--teal)}
+.pw{position:relative}
+.pw input{padding-right:64px}
+.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--teal);font:600 .85rem inherit;font-family:inherit;padding:6px 8px;cursor:pointer}
+.opts{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 6px;font-size:.9rem}
+.chk{display:flex;align-items:center;gap:6px;margin:0;font-size:.9rem}
+a{color:var(--teal);font-weight:600}
+#err{min-height:1.5em;margin:10px 0 8px;font-size:.92rem;font-weight:600}
+#err.err{color:var(--red)}#err.info{color:var(--teal-dark)}
+.go{width:100%;border:0;border-radius:6px;background:var(--teal);color:#fff;font:700 1rem inherit;font-family:inherit;padding:12px;cursor:pointer}
+.go:hover{background:var(--teal-dark)}
+.go:disabled{opacity:.7;cursor:wait}
+.alt{text-align:center;margin:14px 0 0;font-size:.9rem}
+.right{background:var(--cyan);display:flex;align-items:center;justify-content:center;padding:32px 24px}
+figure{margin:0;text-align:center;max-width:320px}
+figure img{width:100%;max-width:280px;height:auto;display:block;margin:0 auto;border-radius:20px;box-shadow:0 10px 30px rgba(11,90,99,.18)}
+figcaption{margin-top:22px;color:var(--teal-dark)}
+figcaption strong{display:block;font-size:1.25rem}
+figcaption span{display:block;margin-top:2px;color:#3f5662;font-size:.95rem}
+@media (max-width:760px){.page{grid-template-columns:1fr}.right{padding:28px 24px 40px}}
+</style>
+</head>
+<body>
+<main class="page">
+  <section class="left">
+    <div class="box">
+      <img class="logo" src="jeevadrop.png" alt="JeevaDrop logo">
+      <h1>HOSPITAL</h1>
+      <p class="sub">Blood Bank Management Service</p>
+      <form id="f" novalidate>
+        <label for="u">Username</label>
+        <input id="u" type="text" autocomplete="username" placeholder="Enter your username" autocapitalize="none" spellcheck="false">
+        <label for="p">Password</label>
+        <div class="pw"><input id="p" type="password" autocomplete="current-password" placeholder="Enter your password"><button type="button" id="show" aria-label="Show or hide password">Show</button></div>
+        <div class="opts">
+          <label class="chk"><input type="checkbox" id="rem"> Remember me</label>
+          <a href="#" id="forgot">Forgot password?</a>
+        </div>
+        <p id="err" role="alert" class="err"></p>
+        <button class="go" id="go" type="submit">Login</button>
+      </form>
+      <p class="alt"><a href="#" id="new">Create account</a></p>
+      <p class="alt"><a href="/">&larr; Back to JeevaDrop</a></p>
+    </div>
+  </section>
+  <section class="right">
+    <figure>
+      <img src="login-hands.jpg" alt="A hand offering a drop of blood to another hand">
+      <figcaption>
+        <strong>Please enter correct data</strong>
+        <span>Use the username and password given to your hospital.</span>
+      </figcaption>
+    </figure>
+  </section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const note=(t,k)=>{const e=$('err');e.textContent=t;e.className=k||'err'};
+try{const u=localStorage.getItem('jd-user');if(u){$('u').value=u;$('rem').checked=true}}catch(e){}
+fetch('/api/me').then(r=>r.json()).then(d=>{if(d.user)location.replace('/#stock')}).catch(()=>{});
+$('show').onclick=()=>{const p=$('p'),h=p.type==='password';p.type=h?'text':'password';$('show').textContent=h?'Hide':'Show'};
+$('forgot').onclick=e=>{e.preventDefault();note('Please contact your administrator to reset your password.','info')};
+$('new').onclick=e=>{e.preventDefault();note('Hospital accounts are created by the administrator.','info')};
+$('f').onsubmit=async e=>{
+ e.preventDefault();
+ const u=$('u').value.trim(),p=$('p').value;
+ if(!u||!p){note('Please enter your username and password.');return}
+ $('go').disabled=true;$('go').textContent='Logging in...';note('');
+ try{
+  const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||'Login failed.');
+  try{$('rem').checked?localStorage.setItem('jd-user',u):localStorage.removeItem('jd-user')}catch(x){}
+  location.href='/#stock';
+ }catch(x){
+  note(x instanceof TypeError?'Could not reach the server. Make sure python app.py is running.':x.message);
+  $('go').disabled=false;$('go').textContent='Login';
+ }
+};
+</script>
+</body>
+</html>
